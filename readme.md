@@ -1,4 +1,5 @@
-# Physics-Informed Deep Learning of Incompressible Fluid Dynamics
+# Learning Incompressible Fluid Dynamics from Scratch
+Towards Fast, Differentiable Fluid Models that Generalize
 
 ![image](imgs/readme_img1.png)
 ![image](imgs/readme_img2.png)
@@ -14,7 +15,10 @@ In this project, we aim at learning different time integration schemes (explicit
 ## Publications
 
 Comprehensive background information is provided in our paper:  
-[Physics-Informed Deep Learning of Incompressible Fluid Dynamics](https://arxiv.org/abs/2006.08762), *Nils Wandel, Michael Weinmann, Reinhard Klein*, pre-print 2020
+[Learning Incompressible Fluid Dynamics from Scratch - Towards Fast, Differentiable Fluid Models that Generalize](https://arxiv.org/abs/2006.08762), *Nils Wandel, Michael Weinmann, Reinhard Klein*, pre-print 2020
+
+Recently, we extended this work to 3D, so you might also want to check out:  
+[Fast Fluid Simulations in 3D with Physics-Informed Deep Learning](https://arxiv.org/abs/2012.11893), *Nils Wandel, Michael Weinmann, Reinhard Klein*, pre-print 2020
 
 ## Installation
 

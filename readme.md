@@ -103,7 +103,7 @@ python control_frequency.py --mu=0.1 --rho=4 --dt=4 --target_freq=8
 
 You can set the target frequency (\-\-target_freq) to any value between 2-8.
 
-## Licence
+## License
 
 Feel free to clone this repository and modify it! If it's of good use for you, give it a star and please cite our publications!
 If there are questions left, contact us: wandeln@cs.uni-bonn.de

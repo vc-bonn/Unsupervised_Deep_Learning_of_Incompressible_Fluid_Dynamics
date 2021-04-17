@@ -19,7 +19,7 @@ Comprehensive background information is provided in our paper:
 *Nils Wandel, Michael Weinmann, Reinhard Klein*, ICLR, 2021 ([Video](https://www.youtube.com/watch?v=EU3YuUNVsXQ))
 
 Recently, we extended this work to 3D, so you might also want to check out:  
-[Fast Fluid Simulations in 3D with Physics-Informed Deep Learning](https://arxiv.org/abs/2012.11893)  
+[Teaching the Incompressible Navier Stokes Equations to Fast Neural Surrogate Models in 3D](https://arxiv.org/abs/2012.11893)  
 *Nils Wandel, Michael Weinmann, Reinhard Klein*, Physics of Fluids, 2021 ([Code](https://github.com/aschethor/Teaching_Incompressible_Fluid_Dynamics_to_3D_CNNs),[Video](https://www.youtube.com/watch?v=tKcYJaJtHJE))
 
 ## Installation

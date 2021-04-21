@@ -59,6 +59,7 @@ class Dataset:
 		self.p = torch.zeros(dataset_size,1,h,w)
 		self.v_cond = torch.zeros(dataset_size,2,h,w)# one could also think about p_cond... -> neumann
 		self.cond_mask = torch.zeros(dataset_size,1,h,w)
+		self.padding_x,self.padding_y = 5,3
 		self.n_cond = n_cond
 		if n_cond:
 			self.n_cond_mask = torch.zeros(dataset_size,1,h,w)#neumann condition mask
@@ -162,6 +163,52 @@ class Dataset:
 			self.mousev = flow_v
 			self.mousew = object_w*object_r
 			
+		if type == "DFG_benchmark": # DFG benchmark setup from: http://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_benchmark1_re20.html
+			flow_v = self.max_speed*(np.random.rand()-0.5)*2 #flow velocity TODO: set to 0.3 / 1.5
+			object_r = 0.05/0.41*(self.h-2*self.padding_y) # object radius
+			
+			object_y = 0.2/0.41*(self.h-2*self.padding_y)+self.padding_y
+			object_x = 0.2/0.41*(self.h-2*self.padding_y)+self.padding_x
+			
+			object_vx,object_vy,object_w = 0,0,0 # object angular velocity
+			
+			# 1. generate mesh 2 x [2r x 2r]
+			y_mesh,x_mesh = torch.meshgrid([torch.arange(-object_r,object_r+1),torch.arange(-object_r,object_r+1)])
+			
+			# 2. generate mask
+			mask_ball = ((x_mesh**2+y_mesh**2)<object_r**2).float().unsqueeze(0)
+			
+			# 3. generate v_cond and multiply with mask
+			v_ball = object_w*torch.cat([x_mesh.unsqueeze(0),-y_mesh.unsqueeze(0)])*mask_ball
+			
+			# 4. add masks / v_cond
+			x_pos1, y_pos1 = int((object_x-object_r)),int((object_y-object_r))
+			x_pos2, y_pos2 = x_pos1+mask_ball.shape[1],y_pos1+mask_ball.shape[2]
+			self.cond_mask[index,:,y_pos1:y_pos2,x_pos1:x_pos2] += mask_ball
+			self.v_cond[index,0,y_pos1:y_pos2,x_pos1:x_pos2] += v_ball[0]+object_vy
+			self.v_cond[index,1,y_pos1:y_pos2,x_pos1:x_pos2] += v_ball[1]+object_vx
+			
+			# inlet / outlet flow
+			profile_size = self.v_cond[index,0,(self.padding_y):-(self.padding_y),:(self.padding_x)].shape[0]
+			flow_profile = torch.arange(0,profile_size,1.0)
+			flow_profile *= 0.41/flow_profile[-1]
+			flow_profile = 4*flow_profile*(0.41-flow_profile)/0.1681
+			flow_profile = flow_profile.unsqueeze(1)
+			self.v_cond[index,0,(self.padding_y):-(self.padding_y),:(self.padding_x)] = flow_v*flow_profile
+			self.v_cond[index,0,(self.padding_y):-(self.padding_y),-(self.padding_x):] = flow_v*flow_profile
+			
+			self.env_info[index]["type"] = type
+			self.env_info[index]["x"] = object_x
+			self.env_info[index]["y"] = object_y
+			self.env_info[index]["vx"] = object_vx
+			self.env_info[index]["vy"] = object_vy
+			self.env_info[index]["r"] = object_r
+			self.env_info[index]["w"] = object_w
+			self.env_info[index]["flow_v"] = flow_v
+			self.mousex = object_x
+			self.mousey = object_y
+			self.mousev = flow_v
+			self.mousew = object_w*object_r
 			
 		if type == "box":# block at random position
 			object_h = np.random.randint(5,20) # object height / 2
@@ -355,6 +402,95 @@ class Dataset:
 				self.env_info[index]["y"] = object_y
 				self.env_info[index]["vx"] = object_vx
 				self.env_info[index]["vy"] = object_vy
+				self.env_info[index]["flow_v"] = flow_v
+			
+			if self.env_info[index]["type"] == "DFG_benchmark":
+				object_r = self.env_info[index]["r"]
+				vx_old = self.env_info[index]["vx"]
+				vy_old = self.env_info[index]["vy"]
+				
+				if not self.interactive:
+					flow_v = self.env_info[index]["flow_v"]
+					object_w = self.env_info[index]["w"]
+					object_vx = vx_old*self.brown_damping + self.brown_velocity*np.random.randn()
+					object_vy = vy_old*self.brown_damping + self.brown_velocity*np.random.randn()
+					
+					object_x = self.env_info[index]["x"]+(vx_old+object_vx)/2*self.dt
+					object_y = self.env_info[index]["y"]+(vy_old+object_vy)/2*self.dt
+					
+					if object_x < object_r + self.padding_x + 1:
+						object_x = object_r + self.padding_x + 1
+						object_vx = -object_vx
+					if object_x > self.w - object_r - self.padding_x - 1:
+						object_x = self.w - object_r - self.padding_x - 1
+						object_vx = -object_vx
+						
+					if object_y < object_r + self.padding_y + 1:
+						object_y = object_r + self.padding_y + 1
+						object_vy = -object_vy
+					if object_y > self.h - object_r - self.padding_y - 1:
+						object_y = self.h - object_r - self.padding_y - 1
+						object_vy = -object_vy
+					
+				if self.interactive:
+					flow_v = self.mousev
+					object_w = self.mousew/object_r
+					object_vx = max(min((self.mousex-self.env_info[index]["x"])/self.interactive_spring,self.max_speed),-self.max_speed)
+					object_vy = max(min((self.mousey-self.env_info[index]["y"])/self.interactive_spring,self.max_speed),-self.max_speed)
+					
+					object_x = self.env_info[index]["x"]+(vx_old+object_vx)/2*self.dt
+					object_y = self.env_info[index]["y"]+(vy_old+object_vy)/2*self.dt
+					
+					if object_x < object_r + self.padding_x + 1:
+						object_x = object_r + self.padding_x + 1
+						object_vx = 0
+					if object_x > self.w - object_r - self.padding_x - 1:
+						object_x = self.w - object_r - self.padding_x - 1
+						object_vx = 0
+						
+					if object_y < object_r + self.padding_y + 1:
+						object_y = object_r + self.padding_y + 1
+						object_vy = 0
+					if object_y > self.h - object_r - self.padding_y - 1:
+						object_y = self.h - object_r - self.padding_y - 1
+						object_vy = 0
+				
+				self.cond_mask[index,:,:,:]=0
+				self.cond_mask[index,:,0:3,:]=1
+				self.cond_mask[index,:,(self.h-3):self.h,:]=1
+				self.cond_mask[index,:,:,0:5]=1
+				self.cond_mask[index,:,:,(self.w-5):self.w]=1
+				
+				# 1. generate mesh 2 x [2r x 2r]
+				y_mesh,x_mesh = torch.meshgrid([torch.arange(-object_r,object_r+1),torch.arange(-object_r,object_r+1)])
+				
+				# 2. generate mask
+				mask_ball = ((x_mesh**2+y_mesh**2)<object_r**2).float().unsqueeze(0)
+				
+				# 3. generate v_cond and multiply with mask
+				v_ball = object_w*torch.cat([x_mesh.unsqueeze(0),-y_mesh.unsqueeze(0)])*mask_ball
+				
+				# 4. add masks / v_cond
+				x_pos1, y_pos1 = int((object_x-object_r)),int((object_y-object_r))
+				x_pos2, y_pos2 = x_pos1+mask_ball.shape[1],y_pos1+mask_ball.shape[2]
+				self.cond_mask[index,:,y_pos1:y_pos2,x_pos1:x_pos2] += mask_ball
+				self.v_cond[index,0,y_pos1:y_pos2,x_pos1:x_pos2] += v_ball[0]+object_vy
+				self.v_cond[index,1,y_pos1:y_pos2,x_pos1:x_pos2] += v_ball[1]+object_vx
+				
+				# inlet / outlet flow
+				profile_size = self.v_cond[index,0,(self.padding_y):-(self.padding_y),:(self.padding_x)].shape[0]
+				flow_profile = torch.arange(0,profile_size,1.0)
+				flow_profile *= 0.41/flow_profile[-1]
+				flow_profile = 4*flow_profile*(0.41-flow_profile)/0.1681
+				flow_profile = flow_profile.unsqueeze(1)
+				self.v_cond[index,0,(self.padding_y):-(self.padding_y),:(self.padding_x)] = flow_v*flow_profile
+				self.v_cond[index,0,(self.padding_y):-(self.padding_y),-(self.padding_x):] = flow_v*flow_profile
+				
+				self.env_info[index]["x"] = object_x
+				self.env_info[index]["y"] = object_y
+				self.env_info[index]["vx"] = object_vx
+				self.env_info[index]["vy"] = object_vy
+				self.env_info[index]["w"] = object_w
 				self.env_info[index]["flow_v"] = flow_v
 			
 			if self.env_info[index]["type"] == "box":

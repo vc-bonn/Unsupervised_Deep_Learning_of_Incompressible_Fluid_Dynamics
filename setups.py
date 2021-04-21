@@ -194,8 +194,8 @@ class Dataset:
 			flow_profile *= 0.41/flow_profile[-1]
 			flow_profile = 4*flow_profile*(0.41-flow_profile)/0.1681
 			flow_profile = flow_profile.unsqueeze(1)
-			self.v_cond[index,0,(self.padding_y):-(self.padding_y),:(self.padding_x)] = flow_v*flow_profile
-			self.v_cond[index,0,(self.padding_y):-(self.padding_y),-(self.padding_x):] = flow_v*flow_profile
+			self.v_cond[index,1,(self.padding_y):-(self.padding_y),:(self.padding_x)] = flow_v*flow_profile
+			self.v_cond[index,1,(self.padding_y):-(self.padding_y),-(self.padding_x):] = flow_v*flow_profile
 			
 			self.env_info[index]["type"] = type
 			self.env_info[index]["x"] = object_x
@@ -455,6 +455,7 @@ class Dataset:
 						object_y = self.h - object_r - self.padding_y - 1
 						object_vy = 0
 				
+				self.v_cond[index,:,:,:]=0
 				self.cond_mask[index,:,:,:]=0
 				self.cond_mask[index,:,0:3,:]=1
 				self.cond_mask[index,:,(self.h-3):self.h,:]=1
@@ -483,8 +484,8 @@ class Dataset:
 				flow_profile *= 0.41/flow_profile[-1]
 				flow_profile = 4*flow_profile*(0.41-flow_profile)/0.1681
 				flow_profile = flow_profile.unsqueeze(1)
-				self.v_cond[index,0,(self.padding_y):-(self.padding_y),:(self.padding_x)] = flow_v*flow_profile
-				self.v_cond[index,0,(self.padding_y):-(self.padding_y),-(self.padding_x):] = flow_v*flow_profile
+				self.v_cond[index,1,(self.padding_y):-(self.padding_y),:(self.padding_x)] = flow_v*flow_profile
+				self.v_cond[index,1,(self.padding_y):-(self.padding_y),-(self.padding_x):] = flow_v*flow_profile
 				
 				self.env_info[index]["x"] = object_x
 				self.env_info[index]["y"] = object_y

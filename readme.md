@@ -16,7 +16,7 @@ In this project, we aim at learning different time integration schemes (explicit
 
 Comprehensive background information is provided in our paper:  
 [Learning Incompressible Fluid Dynamics from Scratch - Towards Fast, Differentiable Fluid Models that Generalize](https://arxiv.org/abs/2006.08762)  
-*Nils Wandel, Michael Weinmann, Reinhard Klein*, ICLR, 2021 ([Video](https://www.youtube.com/watch?v=EU3YuUNVsXQ))
+*Nils Wandel, Michael Weinmann, Reinhard Klein*, ICLR, 2021 ([Video](https://www.youtube.com/watch?v=EU3YuUNVsXQ),[Spotlight presentation](https://www.youtube.com/watch?v=wIvFkhsIaRA))
 
 Recently, we extended this work to 3D, so you might also want to check out:  
 [Teaching the Incompressible Navier Stokes Equations to Fast Neural Surrogate Models in 3D](https://arxiv.org/abs/2012.11893)  

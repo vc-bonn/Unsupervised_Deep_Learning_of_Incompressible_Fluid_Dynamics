@@ -18,9 +18,13 @@ Comprehensive background information is provided in our paper:
 [Learning Incompressible Fluid Dynamics from Scratch - Towards Fast, Differentiable Fluid Models that Generalize](https://arxiv.org/abs/2006.08762)  
 *Nils Wandel, Michael Weinmann, Reinhard Klein*, ICLR, 2021 ([Video](https://www.youtube.com/watch?v=EU3YuUNVsXQ),[Spotlight presentation](https://www.youtube.com/watch?v=wIvFkhsIaRA))
 
-Recently, we extended this work to 3D, so you might also want to check out:  
+We extended this work to 3D, so you might also want to check out:  
 [Teaching the Incompressible Navier Stokes Equations to Fast Neural Surrogate Models in 3D](https://arxiv.org/abs/2012.11893)  
 *Nils Wandel, Michael Weinmann, Reinhard Klein*, Physics of Fluids, 2021 ([Code](https://github.com/aschethor/Teaching_Incompressible_Fluid_Dynamics_to_3D_CNNs),[Video](https://www.youtube.com/watch?v=tKcYJaJtHJE))
+
+Recently, we proposed a continuous extension of this work that makes use of Hermite-Splines:  
+[Spline-PINN: Approaching PDEs without Data using Fast, Physics-Informed Hermite-Spline CNNs](https://arxiv.org/abs/2109.07143)  
+*Nils Wandel, Michael Weinmann, Michael Neidlin, Reinhard Klein*, AAAI, 2022 ([Code](https://github.com/aschethor/Spline_PINN))
 
 ## Installation
 
@@ -106,6 +110,17 @@ You can set the target frequency (\-\-target_freq) to any value between 2-8.
 ## License
 
 Feel free to clone this repository and modify it! If it's of good use for you, give it a star and please cite our publications!
+
+```
+@inproceedings{Wandel2021Learning,
+	author = {Wandel, Nils and Weinmann, Michael and Klein, Reinhard},
+	series = {Ninth International Conference on Learning Representations},
+	year = {2021},
+	title = {Learning Incompressible Fluid Dynamics from Scratch - Towards Fast, Differentiable Fluid Models that Generalize},
+	howpublished = {https://arxiv.org/abs/2006.08762},
+}
+```
+
 If there are questions left, contact us: wandeln@cs.uni-bonn.de
 
 ## References

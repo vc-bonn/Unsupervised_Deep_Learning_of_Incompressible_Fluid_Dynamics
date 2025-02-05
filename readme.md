@@ -26,6 +26,10 @@ Recently, we proposed a continuous extension of this work that makes use of Herm
 [Spline-PINN: Approaching PDEs without Data using Fast, Physics-Informed Hermite-Spline CNNs](https://arxiv.org/abs/2109.07143)  
 *Nils Wandel, Michael Weinmann, Michael Neidlin, Reinhard Klein*, AAAI, 2022 ([Code](https://github.com/aschethor/Spline_PINN))
 
+We also recommend looking into our latest work:  
+[Metamizer: a Versatile Neural Optimizer for Fast and Accurate Physics Simulations](https://wandeln.github.io/Metamizer_webpage/)  
+*Nils Wandel, Stefan Schulz, Reinhard Klein*, ICLR, 2025 ([Code](https://github.com/wandeln/Metamizer))
+
 ## Installation
 
 First, create a new Conda-environment:
